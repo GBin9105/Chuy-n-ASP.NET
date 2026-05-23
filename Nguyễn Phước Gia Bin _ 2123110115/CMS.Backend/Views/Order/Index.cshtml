@@ -1,0 +1,50 @@
+﻿@model IEnumerable<CMS.Data.Entities.Order>
+
+@{
+    ViewData["Title"] = "Quản Lý Đơn Hàng";
+}
+
+<div class="container my-4">
+    <h2 class="text-danger text-center mb-4">HỆ THỐNG QUẢN LÝ ĐƠN HÀNG</h2>
+
+    <table class="table table-bordered table-hover text-center shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã Đơn</th>
+                <th>Ngày Đặt</th>
+                <th>Khách Hàng</th>
+                <th>Trạng Thái</th>
+                <th>Ghi Chú</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="font-weight-bold text-danger">#@item.Id</td>
+                    <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-start ps-3">@item.Customer?.FullName</td>
+                    <td>
+                        @if (item.Status == 0)
+                        {
+                            <span class="badge bg-warning p-2 text-dark">Chờ duyệt</span>
+                        }
+                        else if (item.Status == 1)
+                        {
+                            <span class="badge bg-primary p-2 text-white">Đang giao</span>
+                        }
+                        else if (item.Status == 2)
+                        {
+                            <span class="badge bg-success p-2 text-white">Đã giao thành công</span>
+                        }
+                    </td>
+                    <td class="text-muted small">@item.Notes</td>
+                    <td>
+                        <a href="/OrderDetail/Index/@item.Id" class="btn btn-outline-secondary btn-sm">Xem chi tiết</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

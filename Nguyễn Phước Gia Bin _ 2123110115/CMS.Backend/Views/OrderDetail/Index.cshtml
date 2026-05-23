@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CMS.Data.Entities.OrderDetail>
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng";
+    var orderId = ViewData["OrderId"];
+    var totalOrderPrice = (decimal)(ViewData["TotalOrderPrice"] ?? 0);
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark m-0">CHI TIẾT ĐƠN HÀNG <span class="text-danger">#@orderId</span></h2>
+        <a href="/Order" class="btn btn-outline-secondary btn-sm">← Quay lại danh sách đơn hàng</a>
+    </div>
+
+    <table class="table table-bordered table-striped text-center shadow-sm">
+        <thead class="table-warning">
+            <tr>
+                <th>STT</th>
+                <th class="text-start">Tên Sản Phẩm / Thiết Bị</th>
+                <th>Số Lượng</th>
+                <th>Đơn Giá (VND)</th>
+                <th>Thành Tiền (VND)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int stt = 1;
+            }
+            @foreach (var item in Model)
+            {
+                var thanhTien = item.Quantity * item.UnitPrice;
+                <tr>
+                    <td>@(stt++)</td>
+                    <td class="text-start font-weight-bold text-secondary">@item.Product?.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice.ToString("#,##0")</td>
+                    <td class="font-weight-bold text-dark">@thanhTien.ToString("#,##0")</td>
+                </tr>
+            }
+            <tr class="table-light">
+                <td colspan="4" class="text-end font-weight-bold text-uppercase fs-5">Tổng cộng hóa đơn:</td>
+                <td class="font-weight-bold text-danger fs-5">@totalOrderPrice.ToString("#,##0") VND</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
