@@ -1,0 +1,38 @@
+﻿@model CMS.Data.Entities.OrderDetail
+
+@{
+    ViewData["Title"] = "Thêm Sản Phẩm Mới";
+    // Lấy lại OrderId từ Controller gửi sang để biết đang thêm vào đơn nào
+    var currentOrderId = ViewBag.OrderId;
+}
+
+<div class="container mt-4">
+    <h2 class="text-success text-center fw-bold">THÊM SẢN PHẨM VÀO ĐƠN #@currentOrderId</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <input type="hidden" asp-for="OrderId" value="@currentOrderId" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Chọn sản phẩm:</label>
+            <select asp-for="ProductId" asp-items="ViewBag.ProductList" class="form-select" required>
+                <option value="">-- Vui lòng chọn thiết bị / sản phẩm --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Số lượng:</label>
+            <input asp-for="Quantity" class="form-control" type="number" min="1" value="1" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Đơn giá (VND):</label>
+            <input asp-for="UnitPrice" class="form-control" type="number" required />
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Thêm vào đơn</button>
+            <a asp-action="Index" asp-route-id="@currentOrderId" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

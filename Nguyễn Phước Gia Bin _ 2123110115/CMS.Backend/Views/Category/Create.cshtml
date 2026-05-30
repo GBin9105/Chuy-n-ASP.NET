@@ -1,0 +1,27 @@
+﻿@model CMS.Data.Entities.Category
+
+@{
+    ViewData["Title"] = "Thêm Danh Mục";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary text-center">THÊM DANH MỤC MỚI</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tên danh mục:</label>
+            <input asp-for="Name" class="form-control" placeholder="Ví dụ: Sức khỏe, Lập trình..." required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Mô tả:</label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success">Lưu vào hệ thống</button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

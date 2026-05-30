@@ -1,0 +1,40 @@
+﻿@model CMS.Data.Entities.Post
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Bài Viết";
+}
+
+<div class="container mt-4">
+    <h2 class="text-warning text-center fw-bold">CHỈNH SỬA BÀI VIẾT</h2>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedDate" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
+            <input asp-for="Title" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Thuộc danh mục:</label>
+            <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Link ảnh minh họa (ImageUrl):</label>
+            <input asp-for="ImageUrl" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Nội dung bài viết:</label>
+            <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-warning">Cập nhật thay đổi</button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

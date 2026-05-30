@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CMS.Data.Entities.OrderDetail>
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng";
+    var orderId = ViewData["OrderId"];
+    var totalOrderPrice = (decimal)(ViewData["TotalOrderPrice"] ?? 0);
+}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark m-0 fw-bold">CHI TIẾT ĐƠN HÀNG <span class="text-danger">#@orderId</span></h2>
+        <a href="/Order" class="btn btn-outline-secondary btn-sm">← Quay lại danh sách đơn hàng</a>
+    </div>
+
+    <div class="mb-3 text-start">
+        <a asp-action="Create" asp-route-orderId="@orderId" class="btn btn-success">
+            <i class="bi bi-cart-plus"></i> Thêm sản phẩm vào đơn
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped text-center shadow-sm">
+        <thead class="table-warning">
+            <tr>
+                <th>STT</th>
+                <th class="text-start">Tên Sản Phẩm / Thiết Bị</th>
+                <th>Số Lượng</th>
+                <th>Đơn Giá (VND)</th>
+                <th>Thành Tiền (VND)</th>
+                <th style="width: 140px;">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int stt = 1;
+            }
+            @foreach (var item in Model)
+            {
+                var thanhTien = item.Quantity * item.UnitPrice;
+                <tr>
+                    <td>@(stt++)</td>
+                    <td class="text-start fw-bold text-secondary">@item.Product?.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice.ToString("#,##0")</td>
+                    <td class="fw-bold text-dark">@thanhTien.ToString("#,##0")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này khỏi đơn?')">Xóa</a>
+                    </td>
+                </tr>
+            }
+
+            <tr class="table-light">
+                <td colspan="4" class="text-end fw-bold text-uppercase fs-5">Tổng cộng hóa đơn:</td>
+                <td class="fw-bold text-danger fs-5">@totalOrderPrice.ToString("#,##0")</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

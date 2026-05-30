@@ -1,0 +1,35 @@
+﻿@model CMS.Data.Entities.OrderDetail
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Sản Phẩm";
+}
+
+<div class="container mt-4">
+    <h2 class="text-warning text-center fw-bold">SỬA THÔNG TIN SẢN PHẨM TRONG ĐƠN #@Model.OrderId</h2>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="OrderId" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Sản phẩm:</label>
+            <select asp-for="ProductId" asp-items="ViewBag.ProductList" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Số lượng:</label>
+            <input asp-for="Quantity" class="form-control" type="number" min="1" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Đơn giá (VND):</label>
+            <input asp-for="UnitPrice" class="form-control" type="number" required />
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-warning">Cập nhật thay đổi</button>
+            <a asp-action="Index" asp-route-id="@Model.OrderId" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>

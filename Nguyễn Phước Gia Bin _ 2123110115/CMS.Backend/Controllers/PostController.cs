@@ -1,56 +1,95 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // Bắt buộc phải có để làm Menu xổ xuống (Dropdown)
+using Microsoft.EntityFrameworkCore;
+using CMS.Data;
 using CMS.Data.Entities;
-using System.Collections.Generic;
+using System.Linq;
 using System;
 
 namespace CMS.Backend.Controllers
 {
     public class PostController : Controller
     {
-        // 1. Trang danh sách bài viết
-        public IActionResult Index()
-        {
-            var posts = new List<Post>
-            {
-                new Post
-                {
-                    Id = 1,
-                    Title = "Lộ trình học ASP.NET Core cho người mới",
-                    Content = "Nội dung bài viết về lộ trình học .NET chi tiết từ cơ bản đến nâng cao...",
-                    ImageUrl = "https://picsum.photos/id/1/300/200",
-                    CreatedDate = DateTime.Now
-                },
-                new Post
-                {
-                    Id = 2,
-                    Title = "ReactJS và WebAPI: Xu hướng Fullstack 2026",
-                    Content = "Nội dung bài viết về sự kết hợp tuyệt vời giữa React và API trong kiến trúc hiện đại...",
-                    ImageUrl = "https://picsum.photos/id/2/300/200",
-                    CreatedDate = DateTime.Now.AddDays(-1)
-                },
-                new Post
-                {
-                    Id = 3,
-                    Title = "Hướng dẫn cài đặt môi trường Visual Studio",
-                    Content = "Các bước cài đặt công cụ và tiện ích mở rộng cần thiết cho lập trình viên .NET...",
-                    ImageUrl = "https://picsum.photos/id/3/300/200",
-                    CreatedDate = DateTime.Now.AddDays(-2)
-                }
-            };
+        private readonly ApplicationDbContext _context;
 
+        public PostController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // ==========================================
+        // 1. READ - HIỂN THỊ DANH SÁCH & CHI TIẾT
+        // ==========================================
+        public IActionResult Index(int? id)
+        {
+            var query = _context.Posts.Include(p => p.Category).AsQueryable();
+            if (id.HasValue) query = query.Where(p => p.CategoryId == id.Value);
+
+            var posts = query.OrderByDescending(p => p.CreatedDate).ToList();
             return View(posts);
         }
 
-        // 2. Trang chi tiết bài viết (Trang 18)
         public IActionResult Details(int id)
         {
-            var post = new Post
-            {
-                Id = id,
-                Title = "Nội dung chi tiết bài viết số " + id,
-                Content = "Đây là nội dung đầy đủ và chi tiết của bài viết mà bạn vừa click vào. Ở đây code có thể viết dài hơn để thấy sự khác biệt với trang danh sách."
-            };
+            var post = _context.Posts.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
+            if (post == null) return NotFound();
             return View(post);
+        }
+
+        // ==========================================
+        // 2. CREATE - THÊM MỚI BÀI VIẾT
+        // ==========================================
+        [HttpGet]
+        public IActionResult Create()
+        {
+            // Lấy danh sách Category từ Database, đóng gói vào ViewBag để gửi ra giao diện làm Menu xổ xuống
+            ViewBag.CategoryList = new SelectList(_context.Categories.ToList(), "Id", "Name");
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Post model)
+        {
+            model.CreatedDate = DateTime.Now; // Tự động lấy giờ hệ thống hiện tại gán vào ngày đăng
+            _context.Posts.Add(model);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        // ==========================================
+        // 3. UPDATE - SỬA BÀI VIẾT
+        // ==========================================
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var post = _context.Posts.Find(id);
+            if (post == null) return NotFound();
+
+            // Lấy danh sách Category và chọn sẵn danh mục cũ của bài viết
+            ViewBag.CategoryList = new SelectList(_context.Categories.ToList(), "Id", "Name", post.CategoryId);
+            return View(post);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Post model)
+        {
+            _context.Posts.Update(model);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        // ==========================================
+        // 4. DELETE - XÓA BÀI VIẾT
+        // ==========================================
+        public IActionResult Delete(int id)
+        {
+            var post = _context.Posts.Find(id);
+            if (post != null)
+            {
+                _context.Posts.Remove(post);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
     }
 }

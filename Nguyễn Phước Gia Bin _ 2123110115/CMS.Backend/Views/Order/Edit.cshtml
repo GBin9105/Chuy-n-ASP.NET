@@ -1,0 +1,43 @@
+﻿@model CMS.Data.Entities.Order
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Đơn Hàng";
+}
+
+<div class="container mt-4">
+    <h2 class="text-warning text-center fw-bold">CHỈNH SỬA ĐƠN HÀNG</h2>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Khách hàng:</label>
+            <select asp-for="CustomerId" asp-items="ViewBag.CustomerList" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày đặt hàng:</label>
+            <input asp-for="OrderDate" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Trạng thái đơn hàng:</label>
+            <select asp-for="Status" class="form-select">
+                <option value="0">Chờ duyệt</option>
+                <option value="1">Đang giao</option>
+                <option value="2">Đã giao thành công</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ghi chú (Notes):</label>
+            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-warning">Cập nhật thay đổi</button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
