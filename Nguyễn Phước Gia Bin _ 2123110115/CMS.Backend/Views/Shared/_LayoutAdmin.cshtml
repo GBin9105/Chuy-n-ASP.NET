@@ -9,10 +9,28 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <style>
-        .sidebar { min-height: 100vh; background-color: #212529; color: white; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px 20px; }
-        .sidebar a:hover { background-color: #343a40; color: white; }
-        .sidebar .active { background-color: #0d6efd; color: white; }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+        }
+
+            .sidebar a {
+                color: #adb5bd;
+                text-decoration: none;
+                display: block;
+                padding: 10px 20px;
+            }
+
+                .sidebar a:hover {
+                    background-color: #343a40;
+                    color: white;
+                }
+
+            .sidebar .active {
+                background-color: #0d6efd;
+                color: white;
+            }
     </style>
 </head>
 <body>
@@ -21,7 +39,18 @@
 
             <nav class="col-md-3 col-lg-2 sidebar p-0">
                 <div class="p-3 text-center border-bottom border-secondary">
-                    <h4 class="text-white fw-bold">Bin Admin</h4>
+                    <h4 class="text-white fw-bold mb-3">Bin Admin</h4>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="text-info small mb-2">
+                            Chào, <strong class="text-warning">@User.FindFirst("FullName")?.Value</strong><br />
+                            <span class="text-muted">(@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                        </div>
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-outline-danger w-100">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </a>
+                    }
                 </div>
                 <div class="mt-3">
                     <a asp-controller="Home" asp-action="Index">

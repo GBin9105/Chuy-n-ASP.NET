@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // Thư viện này cần thiết để dùng AsNoTracking()
 using CMS.Data;
 using CMS.Data.Entities;
@@ -6,6 +7,7 @@ using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")] // Ổ KHÓA VIP: Bắt buộc đăng nhập VÀ phải là Admin mới được vào
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;

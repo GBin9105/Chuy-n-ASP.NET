@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http; // Thư viện cho IFormFile
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize] // Ổ KHÓA: Bắt buộc phải đăng nhập mới được quản lý bài viết
     public class PostController : Controller
     {
         private readonly ApplicationDbContext _context;

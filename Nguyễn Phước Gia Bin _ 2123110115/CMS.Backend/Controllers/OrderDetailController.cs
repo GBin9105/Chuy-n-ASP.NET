@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; // Để làm Menu Dropdown chọn Sản phẩm
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
@@ -7,6 +8,7 @@ using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize] // Ổ KHÓA: Bảo vệ nghiêm ngặt chi tiết của từng đơn hàng
     public class OrderDetailController : Controller
     {
         private readonly ApplicationDbContext _context;
