@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies; // Khai báo thêm thư viện Cookie
+using Microsoft.AspNetCore.Authentication.Cookies;
 using CMS.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,19 +7,36 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Đăng ký DbContext vào hệ thống (Bước cắm điện kết nối Database)
+// ==========================================
+// 1. CẤU HÌNH SWAGGER (Đã hết lỗi đỏ sau khi cài Package)
+// ==========================================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Đăng ký DbContext kết nối Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ========================================================
-// BƯỚC 1: KHAI BÁO DỊCH VỤ XÁC THỰC BẰNG COOKIE
-// ========================================================
+// Khai báo dịch vụ xác thực bằng Cookie (Buổi 5)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; // Đường dẫn nếu chưa đăng nhập
-        options.AccessDeniedPath = "/Account/AccessDenied"; // Đường dẫn nếu không đủ quyền
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
     });
+
+// ========================================================
+// BUỔI 6: ĐĂNG KÝ CHÍNH SÁCH CORS (CORS POLICY)
+// ========================================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()   // Cho phép mọi nguồn (bao gồm cả ReactJS localhost:3000) gọi vào
+              .AllowAnyMethod()   // Cho phép dùng tất cả phương thức (GET, POST, PUT, DELETE)
+              .AllowAnyHeader();  // Cho phép gửi mọi kiểu dữ liệu Header lên kèm theo
+    });
+});
 
 var app = builder.Build();
 
@@ -27,8 +44,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    // ==========================================
+    // 2. KÍCH HOẠT HIỂN THỊ GIAO DIỆN SWAGGER 
+    // ==========================================
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -37,10 +61,14 @@ app.UseStaticFiles();
 app.UseRouting();
 
 // ========================================================
-// BƯỚC 2: KÍCH HOẠT CHỐT CHẶN (Phải đúng thứ tự)
+// BUỔI 6: KÍCH HOẠT CHÍNH SÁCH CORS (VỊ TRÍ BẮT BUỘC)
+// Mẹo: Lệnh này PHẢI nằm ngay dưới app.UseRouting() 
+// và nằm TRÊN các lệnh xác thực UseAuthentication, UseAuthorization.
 // ========================================================
-app.UseAuthentication(); // BƯỚC A: Xác nhận "Anh là ai?" (Kiểm tra thẻ bài)
-app.UseAuthorization();  // BƯỚC B: Xác nhận "Anh được làm gì?" (Kiểm tra quyền hạn)
+app.UseCors("AllowAll");
+
+app.UseAuthentication(); // Xác nhận "Anh là ai?"
+app.UseAuthorization();  // Xác nhận "Anh được làm gì?"
 
 app.MapControllerRoute(
     name: "default",
