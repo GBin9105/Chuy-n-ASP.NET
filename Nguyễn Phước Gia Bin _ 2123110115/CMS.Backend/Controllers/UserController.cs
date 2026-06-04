@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // Thư viện này cần thiết để dùng AsNoTracking()
 using CMS.Data;
 using CMS.Data.Entities;
 using System.Linq;
@@ -14,9 +15,6 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // ==========================================
-        // 1. READ - HIỂN THỊ DANH SÁCH
-        // ==========================================
         public IActionResult Index()
         {
             var users = _context.Users.ToList();
@@ -35,6 +33,16 @@ namespace CMS.Backend.Controllers
         [HttpPost]
         public IActionResult Create(User model)
         {
+            // Kiểm tra xem tên đăng nhập đã tồn tại chưa
+            var checkExist = _context.Users.Any(u => u.Username == model.Username);
+
+            if (checkExist)
+            {
+                // Báo lỗi về giao diện nếu trùng tên
+                ModelState.AddModelError("Username", "Tên đăng nhập này đã có người dùng!");
+                return View(model);
+            }
+
             _context.Users.Add(model);
             _context.SaveChanges();
             return RedirectToAction("Index");
@@ -53,10 +61,26 @@ namespace CMS.Backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(User model)
+        public IActionResult Edit(User model, string NewPassword)
         {
+            // 1. Tìm User gốc trong Database (dùng AsNoTracking để tránh xung đột dữ liệu)
+            var existingUser = _context.Users.AsNoTracking().FirstOrDefault(u => u.Id == model.Id);
+            if (existingUser == null) return NotFound();
+
+            // 2. Xử lý mật khẩu: Nhập mới thì lấy cái mới, để trống thì lấy cái cũ
+            if (!string.IsNullOrEmpty(NewPassword))
+            {
+                model.PasswordHash = NewPassword;
+            }
+            else
+            {
+                model.PasswordHash = existingUser.PasswordHash;
+            }
+
+            // 3. Cập nhật vào Database
             _context.Users.Update(model);
             _context.SaveChanges();
+
             return RedirectToAction("Index");
         }
 

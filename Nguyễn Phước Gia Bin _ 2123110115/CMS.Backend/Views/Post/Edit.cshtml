@@ -2,39 +2,77 @@
 
 @{
     ViewData["Title"] = "Chỉnh Sửa Bài Viết";
+    Layout = "_LayoutAdmin";
 }
 
 <div class="container mt-4">
-    <h2 class="text-warning text-center fw-bold">CHỈNH SỬA BÀI VIẾT</h2>
-    <hr />
-
-    <form asp-action="Edit" method="post">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="CreatedDate" />
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
-            <input asp-for="Title" class="form-control" required />
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> CHỈNH SỬA BÀI VIẾT</h5>
         </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Thuộc danh mục:</label>
-            <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" class="form-select" required></select>
-        </div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedDate" />
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Link ảnh minh họa (ImageUrl):</label>
-            <input asp-for="ImageUrl" class="form-control" />
-        </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
+                            <input asp-for="Title" class="form-control" required />
+                        </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Nội dung bài viết:</label>
-            <textarea asp-for="Content" class="form-control" rows="6"></textarea>
-        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nội dung chi tiết:</label>
+                            <textarea asp-for="Content" class="form-control" rows="10"></textarea>
+                        </div>
+                    </div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-warning">Cập nhật thay đổi</button>
-            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thuộc danh mục:</label>
+                            <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" class="form-select" required></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ảnh đại diện hiện tại:</label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-2 text-center">
+                                    <img src="@Model.ImageUrl" class="img-thumbnail shadow-sm" alt="Ảnh hiện tại" style="max-height: 150px; object-fit: cover;" />
+                                </div>
+                            }
+
+                            <label class="form-label fw-bold mt-2">Đổi ảnh mới (Để trống nếu giữ nguyên):</label>
+                            <input type="file" name="uploadImage" class="form-control" accept="image/*" />
+                        </div>
+
+                        <hr />
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning fw-bold">
+                                <i class="bi bi-save"></i> Cập nhật thay đổi
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
         </div>
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <script>
+        // CKEditor tự động đọc dữ liệu cũ trong thẻ Content và hiển thị lại định dạng
+        ClassicEditor
+            .create(document.querySelector('#Content'))
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+}

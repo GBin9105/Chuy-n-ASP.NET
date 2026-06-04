@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Chi Tiết Đơn Hàng";
+    Layout = "_LayoutAdmin";
     var orderId = ViewData["OrderId"];
     var totalOrderPrice = (decimal)(ViewData["TotalOrderPrice"] ?? 0);
 }

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    Layout = "_LayoutAdmin";
 }
 
 <div class="container my-5">
@@ -21,7 +22,7 @@
             </div>
 
             <div class="text-dark mb-4" style="line-height: 1.8; font-size: 1.1rem; text-align: justify;">
-                @Model.Content
+                @Html.Raw(Model.Content)
             </div>
 
             <hr />
