@@ -1,0 +1,38 @@
+﻿@model CMS.Data.Entities.Post
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-dark mb-3 fw-bold">@Model.Title</h1>
+
+            <div class="mb-3">
+                <span class="badge bg-primary me-2">@Model.Category?.Name</span>
+                <span class="text-muted small">Ngày đăng: @Model.CreatedDate.ToString("dd/MM/yyyy") - Mã bài viết: #@Model.Id</span>
+            </div>
+
+            <hr />
+
+            <div class="text-center mb-4">
+                <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm" alt="Hình ảnh bài viết" style="max-height: 450px; width: 100%; object-fit: cover;">
+            </div>
+
+            <div class="text-dark mb-4" style="line-height: 1.8; font-size: 1.1rem; text-align: justify;">
+                @Html.Raw(Model.Content)
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-between mt-4 mb-5">
+                <a asp-action="Index" class="btn btn-outline-secondary">← Quay lại danh sách</a>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4">Sửa bài này</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
