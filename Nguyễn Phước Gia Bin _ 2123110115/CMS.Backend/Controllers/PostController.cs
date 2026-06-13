@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
-using System.IO; // Thư viện để xử lý File
+using System.IO;
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Http; // Thư viện cho IFormFile
+using Microsoft.AspNetCore.Http;
 
 namespace CMS.Backend.Controllers
 {
@@ -112,6 +112,25 @@ namespace CMS.Backend.Controllers
             _context.Posts.Update(model);
             _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        // ==========================================
+        // DETAILS - XEM CHI TIẾT BÀI VIẾT
+        // ==========================================
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            // Tìm bài viết theo ID
+            var post = _context.Posts.Find(id);
+
+            // Nếu không tìm thấy thì báo lỗi 404
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            // Nếu tìm thấy thì ném dữ liệu sang View để hiển thị
+            return View(post);
         }
 
         // ==========================================
