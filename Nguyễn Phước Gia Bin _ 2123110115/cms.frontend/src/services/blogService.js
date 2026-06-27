@@ -11,7 +11,10 @@ const blogService = {
     getBlogCategories: () => {
         const url = '/Categories'; // Đảm bảo API này khớp với Backend của bạn
         return axiosClient.get(url);
-    }
+    },
+    getPostById: (id) => {
+    return axiosClient.get(`/Posts/${id}`);
+},
 };
 
 export default blogService;

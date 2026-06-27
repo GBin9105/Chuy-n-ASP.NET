@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CMS.Backend.Controllers
 {
@@ -17,45 +19,74 @@ namespace CMS.Backend.Controllers
         }
 
         // ========================================================
-        // 1. API LẤY TOÀN BỘ DANH SÁCH SẢN PHẨM (GET)
+        // 1. API LẤY TOÀN BỘ DANH SÁCH & XỬ LÝ LỌC SẢN PHẨM (GET)
         // Đường dẫn: GET /api/products
-        // Sử dụng ở FE: Đổ dữ liệu vào lưới sản phẩm tổng quát (ProductGrid)
+        // Sử dụng ở FE: Đổ dữ liệu vào lưới và xử lý bộ lọc nâng cao
         // ========================================================
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int? categoryProductId,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] string? keyword)
         {
-            var products = _context.Products
-                .OrderByDescending(p => p.Id) // Sản phẩm mới nhập về lên đầu
-                .Select(p => new {
-                    p.Id,
-                    p.Name,
-                    p.Price,
-                    p.ImageUrl
-                })
-                .ToList();
+            try
+            {
+                // Khởi tạo câu truy vấn dạng IQueryable để tối ưu hiệu năng
+                var query = _context.Products.AsQueryable();
 
-            return Ok(products);
+                // Lọc theo Danh mục
+                if (categoryProductId.HasValue)
+                {
+                    query = query.Where(p => p.CategoryProductId == categoryProductId.Value);
+                }
+
+                // Lọc theo Giá tối thiểu
+                if (minPrice.HasValue)
+                {
+                    query = query.Where(p => p.Price >= minPrice.Value);
+                }
+
+                // Lọc theo Giá tối đa
+                if (maxPrice.HasValue)
+                {
+                    query = query.Where(p => p.Price <= maxPrice.Value);
+                }
+
+                // Lọc theo Từ khóa tìm kiếm (Tên sản phẩm)
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(p => p.Name.Contains(keyword.Trim()));
+                }
+
+                // Sắp xếp sản phẩm mới lên đầu và thực thi câu lệnh SQL
+                var products = await query.OrderByDescending(p => p.Id).ToListAsync();
+
+                return Ok(products);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi hệ thống: {ex.Message}" });
+            }
         }
 
         // ========================================================
         // 2. API LẤY SẢN PHẨM THEO DANH MỤC (GET)
         // Đường dẫn: GET /api/products/category/{categoryProductId}
-        // Sử dụng ở FE: Chạy khi chọn một danh mục trên thanh menu lọc
         // ========================================================
         [HttpGet("category/{categoryProductId}")]
-        public IActionResult GetByCategory(int categoryProductId)
+        public async Task<IActionResult> GetByCategory(int categoryProductId)
         {
-            // Mẹo: Hãy kiểm tra lại tên thuộc tính khóa ngoại trong thực thể Product của bạn 
-            // (có thể là ProductCategoryId hoặc CategoryProductId) để sửa lại cho khớp nhé.
-            var products = _context.Products
+            var products = await _context.Products
                 .Where(p => p.CategoryProductId == categoryProductId)
+                .OrderByDescending(p => p.Id)
                 .Select(p => new {
                     p.Id,
                     p.Name,
                     p.Price,
                     p.ImageUrl
                 })
-                .ToList();
+                .ToListAsync();
 
             return Ok(products);
         }
@@ -63,12 +94,13 @@ namespace CMS.Backend.Controllers
         // ========================================================
         // 3. API LẤY CHI TIẾT MỘT SẢN PHẨM (GET BY ID)
         // Đường dẫn: GET /api/products/{id}
-        // Sử dụng ở FE: Phục vụ hiển thị thông tin trang ProductDetail.jsx
+        // Sử dụng ở FE: Xử lý hiển thị trang chi tiết và fix lỗi 404
         // ========================================================
         [HttpGet("{id}")]
-        public IActionResult GetDetail(int id)
+        public async Task<IActionResult> GetDetail(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+            // Truy vấn lấy chi tiết 1 sản phẩm theo ID
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
             // Nếu không tìm thấy sản phẩm có ID tương ứng
             if (product == null)
@@ -76,7 +108,7 @@ namespace CMS.Backend.Controllers
                 return NotFound(new { message = "Không tìm thấy thông tin sản phẩm này!" });
             }
 
-            // Đối với trang chi tiết, trả về toàn bộ thực thể (gồm Description, StockQuantity...)
+            // Trả về toàn bộ thông tin (gồm Description, StockQuantity...) kèm mã 200 OK
             return Ok(product);
         }
     }

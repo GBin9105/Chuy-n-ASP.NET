@@ -1,0 +1,44 @@
+﻿@model CMS.Data.Entities.CategoryProduct
+@{
+    ViewData["Title"] = "Sửa Danh Mục";
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm border-0 col-md-8 mx-auto">
+        <div class="card-header bg-white border-bottom pt-4 pb-3">
+            <h4 class="font-weight-bold text-uppercase mb-0">Cập Nhật Danh Mục</h4>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">Tên danh mục <span class="text-danger">*</span></label>
+                    <input asp-for="Name" class="form-control" required />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Mô tả chi tiết</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a asp-action="Index" class="btn btn-secondary mr-3">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Hủy bỏ
+                    </a>
+                    <button type="submit" class="btn btn-warning px-4 font-weight-bold">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i> Cập Nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

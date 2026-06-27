@@ -1,0 +1,58 @@
+﻿@model IEnumerable<CMS.Data.Entities.CategoryProduct>
+@{
+    ViewData["Title"] = "Quản lý Danh mục Sản phẩm";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="font-weight-bold text-uppercase">Danh Sách Danh Mục</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fa-solid fa-plus mr-2"></i> Thêm danh mục mới
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0 text-center align-middle">
+                <thead class="thead-dark">
+                    <tr>
+                        <th width="10%">ID</th>
+                        <th width="30%">Tên Danh Mục</th>
+                        <th width="40%">Mô Tả</th>
+                        <th width="20%">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="font-weight-bold">@item.Id</td>
+                                <td class="text-left font-weight-bold text-primary">@item.Name</td>
+                                <td class="text-left text-muted">@(string.IsNullOrEmpty(item.Description) ? "Không có mô tả" : item.Description)</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm mr-2">
+                                        <i class="fa-solid fa-pen-to-square"></i> Sửa
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục @item.Name này không? Mọi sản phẩm thuộc danh mục này có thể bị ảnh hưởng!');">
+                                        <i class="fa-solid fa-trash"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                Chưa có danh mục nào. Hãy thêm danh mục mới!
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

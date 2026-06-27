@@ -34,7 +34,7 @@ const CategoryProductList = () => {
         <div className="card shadow-sm border-0 rounded-lg">
             <div className="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
                 <h5 className="card-title text-uppercase font-weight-bold text-dark d-flex align-items-center mb-0" style={{ letterSpacing: '0.5px', fontSize: '1.1rem' }}>
-                    <i className="fa-solid fa-toolbox text-warning mr-2" style={{ fontSize: '1.3rem' }}></i> DANH MỤC MÁY
+                    <i className="fa-solid fa-toolbox text-warning mr-2" style={{ fontSize: '1.3rem' }}></i> DANH MỤC
                 </h5>
             </div>
             <div className="card-body p-0">

@@ -25,7 +25,7 @@ const PostList = () => {
     return (
         <div className="mt-5">
             <h4 className="mb-4 text-uppercase text-secondary font-weight-bold border-bottom pb-2">
-                <i className="fa-solid fa-newspaper text-info mr-2"></i> Kiến thức & Mẹo vặt
+                <i className="fa-solid fa-newspaper text-info mr-2"></i> Tin Tức
             </h4>
 
             {posts.length === 0 ? (
