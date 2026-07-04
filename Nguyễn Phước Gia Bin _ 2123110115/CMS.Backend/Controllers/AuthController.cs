@@ -23,7 +23,7 @@ namespace CMS.Backend.Controllers
         [HttpPost("CustomerRegister")]
         public IActionResult Register([FromBody] Customer model)
         {
-            // Kiểm tra xem Email này đã có người đăng ký chưa
+            // Kiểm tra xem Email này đã có người đăng ký chưa (Tiêu chí 34)
             var emailExist = _context.Customers.Any(c => c.Email == model.Email);
             if (emailExist)
             {
@@ -31,7 +31,11 @@ namespace CMS.Backend.Controllers
                 return BadRequest(new { message = "Email này đã được sử dụng, vui lòng dùng email khác!" });
             }
 
-            // Lưu khách hàng mới vào Database (Bảng Customers của bạn)
+            // TIÊU CHÍ 33 & 34: MÃ HÓA MẬT KHẨU BẰNG BCRYPT TRƯỚC KHI LƯU
+            // Mật khẩu người dùng nhập (VD: "123456") sẽ được băm thành chuỗi ngẫu nhiên
+            model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
+
+            // Lưu khách hàng mới vào Database
             _context.Customers.Add(model);
             _context.SaveChanges();
 
@@ -46,11 +50,12 @@ namespace CMS.Backend.Controllers
         [HttpPost("CustomerLogin")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            // Tìm khách hàng có Email và Mật khẩu khớp với dữ liệu gửi lên
+            // 1. Chỉ tìm khách hàng theo Email (Chưa xét Password vội)
             var customer = _context.Customers
-                .FirstOrDefault(c => c.Email == request.Email && c.Password == request.Password);
+                .FirstOrDefault(c => c.Email == request.Email);
 
-            if (customer == null)
+            // 2. Kiểm tra tài khoản có tồn tại không VÀ giải mã kiểm tra mật khẩu bằng BCrypt
+            if (customer == null || !BCrypt.Net.BCrypt.Verify(request.Password, customer.Password))
             {
                 // Trả về lỗi 401 (Unauthorized) nếu sai thông tin
                 return Unauthorized(new { message = "Email hoặc mật khẩu không chính xác!" });
@@ -70,7 +75,6 @@ namespace CMS.Backend.Controllers
 
     // ========================================================
     // CLASS HỖ TRỢ: Dùng để hứng dữ liệu Đăng nhập từ ReactJS gửi lên
-    // (Bắt buộc phải có để API hiểu được Email và Password gửi từ FE)
     // ========================================================
     public class LoginRequest
     {

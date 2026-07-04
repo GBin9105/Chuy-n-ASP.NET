@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
-const IMAGE_BASE_URL = "https://localhost:7053"; // Sửa lại cổng nếu Backend của bạn chạy cổng khác
+// 1. IMPORT TỔNG ĐÀI CONTEXT GIỎ HÀNG
+import { CartContext } from '../../context/CartContext'; // Căn chỉnh lại dấu ../ nếu thư mục của bạn sâu hơn
+
+const IMAGE_BASE_URL = "https://localhost:7053"; 
 
 function Cart() {
-    const [cartItems, setCartItems] = useState([]);
+    // 2. LẤY DỮ LIỆU VÀ CÁC HÀM XỬ LÝ TỪ CONTEXT DÙNG CHUNG
+    const { cartItems, setCartItems } = useContext(CartContext);
 
-    // 1. Lấy dữ liệu giỏ hàng từ LocalStorage khi trang vừa render
-    useEffect(() => {
-        const storedCart = JSON.parse(localStorage.getItem('POWER_TOOLS_CART')) || [];
-        setCartItems(storedCart);
-    }, []);
-
-    // 2. Hàm xóa sản phẩm khỏi giỏ hàng
+    // 3. Hàm xóa sản phẩm khỏi giỏ hàng (Đồng bộ thẳng lên Context)
     const handleRemoveItem = (productId) => {
         const updatedCart = cartItems.filter(item => item.productId !== productId);
         setCartItems(updatedCart);
         localStorage.setItem('POWER_TOOLS_CART', JSON.stringify(updatedCart));
     };
 
-    // 3. Hàm tăng/giảm số lượng (có check lại tồn kho)
+    // 4. Hàm tăng/giảm số lượng có check tồn kho (Đồng bộ thẳng lên Context)
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return; // Không cho giảm dưới 1
         
@@ -27,7 +25,7 @@ function Cart() {
             if (item.productId === productId) {
                 if (newQuantity > item.stockQuantity) {
                     alert(`⚠️ Kho hàng hiện chỉ còn ${item.stockQuantity} chiếc!`);
-                    return item; // Giữ nguyên số lượng cũ nếu cố tình tăng quá kho
+                    return item; 
                 }
                 return { ...item, quantity: newQuantity };
             }
@@ -38,7 +36,7 @@ function Cart() {
         localStorage.setItem('POWER_TOOLS_CART', JSON.stringify(updatedCart));
     };
 
-    // 4. Tính tổng tiền thanh toán
+    // Tính tổng tiền thanh toán
     const totalPrice = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
     // Format tiền tệ VNĐ
@@ -51,7 +49,6 @@ function Cart() {
             <h2 className="font-weight-bold text-uppercase mb-4">Giỏ hàng của bạn</h2>
             
             {cartItems.length === 0 ? (
-                // Hiển thị khi giỏ hàng trống
                 <div className="text-center py-5 bg-white shadow-sm rounded">
                     <h5 className="text-secondary mb-4">Giỏ hàng đang trống</h5>
                     <Link to="/products" className="btn btn-warning font-weight-bold px-4 py-2">
@@ -59,7 +56,6 @@ function Cart() {
                     </Link>
                 </div>
             ) : (
-                // Hiển thị khi có sản phẩm
                 <div className="row">
                     <div className="col-lg-8">
                         <div className="card border-0 shadow-sm mb-4">
@@ -130,9 +126,10 @@ function Cart() {
                                 <span className="text-muted">Tạm tính:</span>
                                 <h4 className="text-danger font-weight-bold">{formatVND(totalPrice)}</h4>
                             </div>
-<Link to="/checkout" className="btn btn-warning btn-block font-weight-bold py-3 mb-2">
-    TIẾN HÀNH THANH TOÁN
-</Link>                            <Link to="/products" className="btn btn-outline-secondary btn-block font-weight-bold">
+                            <Link to="/checkout" className="btn btn-warning btn-block font-weight-bold py-3 mb-2">
+                                TIẾN HÀNH THANH TOÁN
+                            </Link>
+                            <Link to="/products" className="btn btn-outline-secondary btn-block font-weight-bold">
                                 Tiếp tục mua sắm
                             </Link>
                         </div>

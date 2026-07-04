@@ -1,16 +1,18 @@
 ﻿@model IEnumerable<CMS.Data.Entities.Post>
 @{
-    ViewData["Title"] = "Quản lý Bài viết";
+    ViewData["Title"] = "Quản Lý Bafi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-
 <div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="font-weight-bold text-uppercase">Danh Sách Bài Viết</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i> Thêm bài viết mới
+    <!-- Tiêu đề và nút thêm mới -->
+    <div class="mb-4">
+        <h2 class="font-weight-bold">Danh sách Bài viết</h2>
+        <a asp-action="Create" class="btn btn-primary mt-2">
+            Thêm bài viết mới
         </a>
     </div>
 
+    <!-- Bảng danh sách -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <table class="table table-hover table-bordered mb-0 align-middle text-center">
@@ -20,7 +22,7 @@
                         <th width="15%">Ảnh bìa</th>
                         <th width="35%">Tiêu đề</th>
                         <th width="15%">Danh mục</th>
-                        <th width="30%">Hành động</th>
+                        <th width="30%">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,18 +42,18 @@
                                         <span class="text-muted small">Không có ảnh</span>
                                     }
                                 </td>
-                                <td class="text-start fw-bold text-primary">@item.Title</td>
+                                <td class="text-start fw-bold text-dark">@item.Title</td>
                                 <td>@(item.Category != null ? item.Category.Name : "Không có")</td>
                                 <td>
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white me-1">
-                                        <i class="bi bi-eye"></i> Xem
+                                        Xem
                                     </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-1">
-                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm text-white me-1">
+                                        Sửa
                                     </a>
                                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
                                        onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');">
-                                        <i class="bi bi-trash"></i> Xóa
+                                        Xóa
                                     </a>
                                 </td>
                             </tr>
@@ -67,4 +69,4 @@
             </table>
         </div>
     </div>
-</div>
+</div>  

@@ -146,5 +146,39 @@ namespace CMS.Backend.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        // =========================================================
+        // TIÊU CHÍ 35: API XỬ LÝ UPLOAD ẢNH TỪ TRONG KHUNG CKEDITOR
+        // =========================================================
+        [HttpPost]
+        public IActionResult UploadImageCKEditor(IFormFile upload)
+        {
+            if (upload != null && upload.Length > 0)
+            {
+                // 1. Lưu file vào thư mục wwwroot/uploads giống như upload ảnh bìa
+                string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(upload.FileName);
+                string filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    upload.CopyTo(stream);
+                }
+
+                // 2. Trả về cấu trúc JSON đúng chuẩn mà CKEditor yêu cầu
+                var url = "/uploads/" + fileName;
+                return Json(new
+                {
+                    uploaded = 1,
+                    fileName = fileName,
+                    url = url
+                });
+            }
+
+            // Nếu lỗi, trả về uploaded = 0
+            return Json(new { uploaded = 0, error = new { message = "Lỗi: Không thể tải ảnh lên!" } });
+        }
     }
 }

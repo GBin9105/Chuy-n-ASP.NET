@@ -1,6 +1,8 @@
 ﻿@model CMS.Data.Entities.Post
 @{
     ViewData["Title"] = "Sửa Bài Viết";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
 }
 
 <div class="container-fluid mt-4">
@@ -11,7 +13,9 @@
         <div class="card-body p-4">
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="ImageUrl" /> <div class="row">
+                <input type="hidden" asp-for="ImageUrl" />
+
+                <div class="row">
                     <div class="col-md-8 form-group mb-3">
                         <label class="fw-bold">Tiêu đề bài viết <span class="text-danger">*</span></label>
                         <input asp-for="Title" class="form-control" required />
@@ -38,7 +42,8 @@
 
                 <div class="form-group mb-4">
                     <label class="fw-bold">Nội dung chi tiết</label>
-                    <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+                    <!-- Thêm id="Content" để CKEditor nhận diện -->
+                    <textarea asp-for="Content" id="Content" class="form-control" rows="8"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-end">
@@ -51,3 +56,13 @@
         </div>
     </div>
 </div>
+
+<!-- THÊM PHẦN NÀY ĐỂ TÍCH HỢP CKEDITOR -->
+@section Scripts {
+    <!-- Nhúng thư viện CKEditor 4 từ CDN -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>
+        // Lệnh này biến thẻ textarea có id="Content" thành trình soạn thảo
+        CKEDITOR.replace('Content');
+    </script>
+}

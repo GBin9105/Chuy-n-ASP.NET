@@ -1,6 +1,7 @@
 ﻿@model CMS.Data.Entities.Post
 @{
     ViewData["Title"] = "Thêm Bài Viết";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container-fluid mt-4">
@@ -32,7 +33,8 @@
 
                 <div class="form-group mb-4">
                     <label class="fw-bold">Nội dung chi tiết</label>
-                    <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+                    <!-- Thêm id="Content" để CKEditor nhận diện -->
+                    <textarea asp-for="Content" id="Content" class="form-control" rows="8"></textarea>
                 </div>
 
                 <div class="d-flex justify-content-end">
@@ -45,3 +47,20 @@
         </div>
     </div>
 </div>
+
+<!-- THÊM PHẦN NÀY ĐỂ TÍCH HỢP CKEDITOR -->
+@section Scripts {
+    <!-- Nhúng thư viện CKEditor 4 từ CDN -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>
+        // Lệnh này biến thẻ textarea có id="Content" thành trình soạn thảo
+        // TIÊU CHÍ 35: Cấu hình Upload Ảnh
+        CKEDITOR.replace('Content', {
+            // Khai báo đường dẫn API xử lý file ảnh tải lên.
+            // Lưu ý: Đảm bảo trong PostController (Backend) của bạn có hàm UploadImageCKEditor để hứng file này.
+            filebrowserUploadUrl: '/Post/UploadImageCKEditor',
+            filebrowserUploadMethod: 'form',
+            height: 400 // Chiều cao mặc định của khung soạn thảo
+        });
+    </script>
+}

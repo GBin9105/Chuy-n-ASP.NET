@@ -7,18 +7,46 @@ function Blog() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    // Quản lý state lọc
+    // State quản lý phân trang hiển thị
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    
+    // Thêm page và pageSize vào bộ lọc mặc định
     const [filters, setFilters] = useState({
         categoryId: null,
-        keyword: ''
+        keyword: '',
+        page: 1,      // Trang bắt đầu là 1
+        pageSize: 6   // Mỗi trang lấy 6 bài
     });
 
     useEffect(() => {
         const fetchBlogData = async () => {
             try {
                 setLoading(true);
+                // Truyền toàn bộ filters (bao gồm cả page và pageSize) xuống API
                 const response = await postService.getAllPosts(filters);
-                setPosts(response.data || response);
+                
+                // Lấy kết quả thô từ Backend
+                const result = response.data || response;
+                
+                // CODE FIX LỖI: Tìm mảng bài viết thông minh
+                let postsArray = [];
+                if (Array.isArray(result)) {
+                    // Trường hợp Backend trả về mảng trực tiếp
+                    postsArray = result; 
+                } else if (result.data && Array.isArray(result.data)) {
+                    // Trường hợp Backend trả về { data: [...] } (Chữ d thường)
+                    postsArray = result.data;
+                } else if (result.Data && Array.isArray(result.Data)) {
+                    // Trường hợp Backend trả về { Data: [...] } (Chữ D hoa)
+                    postsArray = result.Data;
+                }
+                
+                // Cập nhật state với mảng đã tìm được
+                setPosts(postsArray);
+                setCurrentPage(result.currentPage || result.CurrentPage || 1);
+                setTotalPages(result.totalPages || result.TotalPages || 1);
+
             } catch (error) {
                 console.error("Lỗi nạp dữ liệu phân hệ Blog:", error);
             } finally {
@@ -26,13 +54,22 @@ function Blog() {
             }
         };
         fetchBlogData();
-    }, [filters]); // Theo dõi filters để tự động gọi lại API
+    }, [filters]); // Theo dõi filters để tự động gọi lại API khi đổi trang hoặc đổi danh mục
+
+    // Xử lý khi người dùng bấm chọn số trang
+    const handlePageChange = (newPage) => {
+        setFilters(prev => ({
+            ...prev,
+            page: newPage
+        }));
+    };
 
     // Hàm callback truyền xuống Sidebar
     const handleFilterUpdate = (newCategoryId) => {
         setFilters(prev => ({
             ...prev,
-            categoryId: newCategoryId
+            categoryId: newCategoryId,
+            page: 1 // QUAN TRỌNG: Khi chọn danh mục mới, luôn đưa người dùng về trang 1
         }));
     };
 
@@ -69,7 +106,13 @@ function Blog() {
                             <p className="text-muted m-0 font-italic small">Chủ đề này hiện chưa có bài viết nào được xuất bản.</p>
                         </div>
                     ) : (
-                        <BlogList posts={posts} />
+                        // TRUYỀN DỮ LIỆU PHÂN TRANG XUỐNG BLOGLIST
+                        <BlogList 
+                            posts={posts} 
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     )}
                 </main>
             </div>

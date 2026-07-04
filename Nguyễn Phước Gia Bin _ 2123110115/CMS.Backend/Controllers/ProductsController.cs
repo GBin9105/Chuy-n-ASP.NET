@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace CMS.Backend.Controllers
 {
@@ -19,16 +20,16 @@ namespace CMS.Backend.Controllers
         }
 
         // ========================================================
-        // 1. API LẤY TOÀN BỘ DANH SÁCH & XỬ LÝ LỌC SẢN PHẨM (GET)
-        // Đường dẫn: GET /api/products
-        // Sử dụng ở FE: Đổ dữ liệu vào lưới và xử lý bộ lọc nâng cao
+        // 1. API LẤY TOÀN BỘ DANH SÁCH, LỌC & PHÂN TRANG (GET)
         // ========================================================
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] int? categoryProductId,
             [FromQuery] decimal? minPrice,
             [FromQuery] decimal? maxPrice,
-            [FromQuery] string? keyword)
+            [FromQuery] string? keyword,
+            [FromQuery] int page = 1,         // Phân trang: Trang hiện tại (Mặc định 1)
+            [FromQuery] int pageSize = 8)     // Phân trang: Số lượng SP 1 trang (Mặc định 8)
         {
             try
             {
@@ -59,10 +60,27 @@ namespace CMS.Backend.Controllers
                     query = query.Where(p => p.Name.Contains(keyword.Trim()));
                 }
 
-                // Sắp xếp sản phẩm mới lên đầu và thực thi câu lệnh SQL
-                var products = await query.OrderByDescending(p => p.Id).ToListAsync();
+                // ================= LÓGIC PHÂN TRANG =================
+                // 1. Đếm tổng số sản phẩm thỏa mãn điều kiện lọc
+                int totalItems = await query.CountAsync();
 
-                return Ok(products);
+                // 2. Tính tổng số trang
+                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                // 3. Cắt dữ liệu bằng Skip và Take
+                var products = await query
+                    .OrderByDescending(p => p.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                // Trả về JSON chứa cả Data và thông tin Phân trang
+                return Ok(new
+                {
+                    data = products,
+                    currentPage = page,
+                    totalPages = totalPages
+                });
             }
             catch (System.Exception ex)
             {
@@ -72,7 +90,6 @@ namespace CMS.Backend.Controllers
 
         // ========================================================
         // 2. API LẤY SẢN PHẨM THEO DANH MỤC (GET)
-        // Đường dẫn: GET /api/products/category/{categoryProductId}
         // ========================================================
         [HttpGet("category/{categoryProductId}")]
         public async Task<IActionResult> GetByCategory(int categoryProductId)
@@ -93,8 +110,6 @@ namespace CMS.Backend.Controllers
 
         // ========================================================
         // 3. API LẤY CHI TIẾT MỘT SẢN PHẨM (GET BY ID)
-        // Đường dẫn: GET /api/products/{id}
-        // Sử dụng ở FE: Xử lý hiển thị trang chi tiết và fix lỗi 404
         // ========================================================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetail(int id)

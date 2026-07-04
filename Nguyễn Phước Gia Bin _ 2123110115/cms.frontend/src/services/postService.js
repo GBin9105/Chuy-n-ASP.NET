@@ -1,10 +1,11 @@
-// Đảm bảo đường dẫn import axiosClient đúng với cấu trúc của bạn
 import axiosClient from '../api/axiosClient'; 
 
 const postService = {
-    // 1. Lấy danh sách bài viết (Có hỗ trợ truyền tham số lọc)
+    // 1. Lấy danh sách bài viết (Hỗ trợ lọc và phân trang qua filters)
     getAllPosts: async (filters = {}) => {
         try {
+            // Việc truyền { params: filters } sẽ tự động chuyển đổi object thành chuỗi query
+            // Ví dụ URL sinh ra: /Posts?categoryId=1&page=2&pageSize=6
             const response = await axiosClient.get('/Posts', { params: filters });
             return response.data ? response.data : response;
         } catch(error) {

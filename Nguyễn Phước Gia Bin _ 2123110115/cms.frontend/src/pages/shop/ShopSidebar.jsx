@@ -5,6 +5,16 @@ function ShopSidebar({ activeCategory, minPrice, maxPrice, onFilterChange }) {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // State cục bộ cho ô nhập giá để không gọi API liên tục khi đang gõ
+    const [localMin, setLocalMin] = useState(minPrice || '');
+    const [localMax, setLocalMax] = useState(maxPrice || '');
+
+    // Cập nhật lại ô nhập nếu người dùng bấm "Xóa bộ lọc" từ bên ngoài
+    useEffect(() => {
+        setLocalMin(minPrice || '');
+        setLocalMax(maxPrice || '');
+    }, [minPrice, maxPrice]);
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -19,6 +29,11 @@ function ShopSidebar({ activeCategory, minPrice, maxPrice, onFilterChange }) {
         };
         fetchCategories();
     }, []);
+
+    // Hàm chỉ gọi API khi người dùng thực sự bấm nút Lọc
+    const handleApplyPrice = () => {
+        onFilterChange({ minPrice: localMin, maxPrice: localMax });
+    };
 
     return (
         <div className="card p-3 shadow-sm border-0" style={{ borderRadius: '15px' }}>
@@ -61,19 +76,32 @@ function ShopSidebar({ activeCategory, minPrice, maxPrice, onFilterChange }) {
                     type="number" 
                     className="form-control mb-2" 
                     placeholder="Từ..." 
-                    value={minPrice}
-                    onChange={(e) => onFilterChange({ minPrice: e.target.value })}
+                    value={localMin}
+                    onChange={(e) => setLocalMin(e.target.value)}
                 />
                 <input 
                     type="number" 
                     className="form-control mb-3" 
                     placeholder="Đến..." 
-                    value={maxPrice}
-                    onChange={(e) => onFilterChange({ maxPrice: e.target.value })}
+                    value={localMax}
+                    onChange={(e) => setLocalMax(e.target.value)}
                 />
+                
+                {/* NÚT LỌC GIÁ */}
                 <button 
-                    className="btn btn-sm btn-outline-secondary btn-block mt-2"
-                    onClick={() => onFilterChange({ categoryProductId: null, minPrice: '', maxPrice: '', keyword: '' })}
+                    className="btn btn-sm btn-primary btn-block font-weight-bold mb-2"
+                    onClick={handleApplyPrice}
+                >
+                    Lọc Giá
+                </button>
+
+                <button 
+                    className="btn btn-sm btn-outline-secondary btn-block"
+                    onClick={() => {
+                        setLocalMin('');
+                        setLocalMax('');
+                        onFilterChange({ categoryProductId: null, minPrice: '', maxPrice: '', keyword: '' });
+                    }}
                 >
                     Xóa bộ lọc
                 </button>
